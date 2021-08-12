@@ -1,0 +1,40 @@
+#!/bin/bash
+
+#if [-n "$1"]
+#then 
+function upgrade () {
+apt-get upgrade nginx=="$major2.$minor2.$roll2"  
+}
+nginx_version=$(nginx -v 2>&1)
+echo "nginx_version = " $nginx_version
+ver_c=$(echo $nginx_version | sed -e 's,.*/,,' | cut -d ' ' -f 1)
+ver_d=$1
+
+major1=$(echo $ver_c | awk -F'.' '{print $1}') 
+minor1=$(echo $ver_c | awk -F'.' '{print $2}')
+roll1=$(echo $ver_c | awk -F'.' '{print $3}')
+
+major2=$(echo $ver_d | awk -F'.' '{print $1}') 
+minor2=$(echo $ver_d | awk -F'.' '{print $2}')
+roll2=$(echo $ver_d | awk -F'.' '{print $3}')
+
+if [ "$major2" -gt "$major1" ]; then 
+	echo "Installing a new version"
+	upgrade
+else
+	if [ "$major2" -eq "$major1" ]; then 
+		#echo "Installation of the new version is not possible"
+                if [ "$minor2" -gt "$minor1" ]; then 
+                        echo "Installing a new version"
+	upgrade
+			else
+                        	if [ "$minor2" -eq "$minor1" ]; then 
+                                          echo "Installation of the new version is not possible"
+                                          if [ "$roll2" -gt "$roll1" ]; then 
+                                                      echo "Installing a new version"
+	upgrade 
+                                          fi
+                                fi
+                fi
+         fi
+fi
